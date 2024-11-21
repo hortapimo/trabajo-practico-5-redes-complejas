@@ -1,0 +1,56 @@
+from Bio import SeqIO
+import numpy as np
+
+def armarMatrizDeFasta(archivo):
+    matriz = []
+    i=0
+    for record in SeqIO.parse(archivo, "fasta"):
+        line =str(record.seq)
+        matriz.append(line)
+
+    
+    return matriz
+
+def calcularFrecuenciaFila(matriz, columna, filaFinal, secuenciaRef):
+    aminoacidoRef = secuenciaRef[columna]
+
+    contador = 0
+    i = 0
+    for i in range(filaFinal):
+        elemento = matriz[i]
+ 
+        if elemento[columna] != aminoacidoRef:
+            contador = contador + 1
+
+    return contador/len(matriz)
+
+def obtenerColumnasConAltaFrecuencia(matriz, secuenciaRef,fCutOff):
+    
+    numColumnas = len(matriz[0])
+    columnasAltafrec = []
+    for columna in range(numColumnas):
+        frecuecia = calcularFrecuenciaFila(matriz, columna, len(matriz), secuenciaRef)
+        if frecuecia>fCutOff:
+            columnasAltafrec.append(columna)
+        
+    return columnasAltafrec
+
+def calcularCorelacion(columnasAltafrec, matriz, cutOff):
+    pass
+    
+    
+           
+    
+#hay que analisar los caracteres x e - .
+
+if __name__ == "__main__":
+    archivo = open( "archivoAlineado.fasta", "r")
+    
+    matriz = armarMatrizDeFasta(archivo)
+    
+    secuenciaRef = "MFVFLVLLPLVSSQCVNFTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFA--STEKSNIIRGWI-FGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSVLEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQPYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQGVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT*"
+    frec=calcularFrecuenciaFila(matriz, 1, len(matriz), secuenciaRef)
+    columnasAltafrec = obtenerColumnasConAltaFrecuencia(matriz, secuenciaRef, fCutOff=0.7)
+    
+    
+    

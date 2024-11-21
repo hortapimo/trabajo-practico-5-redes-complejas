@@ -6,12 +6,12 @@ fasta_file = "spikeprot1103.fasta"
 lista = []
 
 i=0
-limite = 100000
-archivoAux = open("ArgentinaAhoraSi.fasta","x")
+
+archivoAux = open("Chile.fasta","x")
 limiteCaracteresID = 0
 identifiers = {}
 
-pais="Argentina"
+pais="Chile"
 
 # Leer el archivo FASTA y las secuecuencias con ID similar les agrego un numero
 with open(fasta_file, "r",encoding="latin-1") as file:
@@ -28,10 +28,8 @@ with open(fasta_file, "r",encoding="latin-1") as file:
                      identifiers[record.id] = 0
                      archivoAux.write(">"+str(record.id)+"\n" +str(record.seq)+"\n")
                 i = i+1
-            
-            if (i>limite):
-                break
-print(f"hubo {i} secuencias duplicadas")
+
+print(f"tiene {i} secuencias") 
 
 #Separar paor pais
 #Poner la secuencia de wohan
