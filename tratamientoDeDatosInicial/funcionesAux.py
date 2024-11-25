@@ -2,6 +2,7 @@ from Bio import SeqIO
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
 
 def armarMatrizDeFasta(archivo):
     matriz = []
@@ -28,15 +29,18 @@ def calcularFrecuenciaColumna(matriz, columna, secuenciaRef):
     return contador/len(matriz)
 
 
-def calcularCorelacion(columnasAltafrec, matriz, cutOff):
-    rxy = np.zeros((len(columnasAltafrec), len(columnasAltafrec)))
+def calcularCorelacion(frecuenciasMes):
+    rxy = np.zeros((len(frecuenciasMes[0]), len(frecuenciasMes[0])))
     
     
-    for columna in columnasAltafrec:
-        for columna2 in columnasAltafrec:
-            if(columna2== columna):
+    for fila in range(len(rxy)):
+        for columna in range(len(rxy)):
+            if(fila == columna):
+                rxy[fila,columna] =0
                 pass
             else:
+                correlacion,pvalue = pearsonr(x=frecuenciasMes[:,fila],y=frecuenciasMes[:,columna])
+                rxy[fila,columna] = correlacion
                 pass 
     
     return rxy
@@ -54,14 +58,24 @@ def calcularFrecuencias(archivo,matriz, secuenciaRef):
    
     return frecuencias
 
+def plotColumnas(columnas,FrecuenciaPorMes):
+    columnas =[613,822,830,870,924,1050] 
+    fig,ax = plt.subplots()
+
+    for columna in columnas:
+        plotColumna(ax,columna, FrecuenciaPorMes)
+    
+    return(fig,ax)
+
 def plotColumna(ax,columna, matrizFrecuencias):
     frecuencias = [0]*20
     t=0
     for f in matrizFrecuencias:
         frecuencias[t] = f[columna]
         t=t+1
-    
-    ax.plot(range(1,21),frecuencias, label=f"Posicion: {columna}")
+    meses =["5/20","6/20","7/20","8/20","9/20","10/20","11/20","12/20",
+            "1/21","2/21","3/21","4/21","5/21","6/21","7/21","8/21","9/21","10/21","11/21","12/21",]
+    ax.plot(meses,frecuencias, label=f"Posicion: {columna}")
     
            
     
@@ -91,15 +105,24 @@ if __name__ == "__main__":
                 FrecuenciaPorMes[mes+7] =frecuenciasMes
             else:
                 FrecuenciaPorMes[mes-5] =frecuenciasMes
-    
-    columnas =[613,822,830,870,924,1050] 
-    fig,ax = plt.subplots()
+        
+    FrecuenciaPorMes = np.array(FrecuenciaPorMes)
+        
+    matrizAdjacencia = calcularCorelacion(FrecuenciaPorMes)
+        
+    # columnas =[613,822,830,870,924,1050] 
+    # fig,ax = plotColumnas(columnas,FrecuenciaPorMes)
+  
+    # ax.legend()
+    # ax.set_ylabel("frecuencia de mutacion")
+    # ax.set_xlabel("Mes")
+    # ax.grid()
+    theshold =0.7
 
-    for columna in columnas:
-        plotColumna(ax,columna, FrecuenciaPorMes)
+    matrizAdjacencia[np.isnan(matrizAdjacencia)] = 0
+    matrizAdjacencia[matrizAdjacencia<theshold]=0
+    matrizAdjacencia[matrizAdjacencia>=theshold]=1
     
-    ax.legend()
-    ax.grid()
             
         
                     
