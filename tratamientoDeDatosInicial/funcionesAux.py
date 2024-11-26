@@ -3,6 +3,12 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from scipy.stats import pearsonr
+# 
+
+
+
+
+import networkx as nx
 
 def armarMatrizDeFasta(archivo):
     matriz = []
@@ -12,7 +18,7 @@ def armarMatrizDeFasta(archivo):
         matriz.append(line)
 
     
-    return matriz
+    return np.array(matriz)
 
 def calcularFrecuenciaColumna(matriz, columna, secuenciaRef):
 
@@ -20,13 +26,14 @@ def calcularFrecuenciaColumna(matriz, columna, secuenciaRef):
 
     contador = 0
     i = 0
-    for i in range(len(matriz)):
+    nFilas = len(matriz)
+    for i in range(nFilas):
         elemento = matriz[i]
  
-        if ((elemento[columna] != aminoacidoRef) and (elemento[columna] !='X')):
+        if ((elemento[columna] != aminoacidoRef) and (elemento[columna] !='X') and (elemento[columna] !='-') ):
             contador = contador + 1
 
-    return contador/len(matriz)
+    return contador/nFilas
 
 
 def calcularCorelacion(frecuenciasMes):
@@ -59,7 +66,6 @@ def calcularFrecuencias(archivo,matriz, secuenciaRef):
     return frecuencias
 
 def plotColumnas(columnas,FrecuenciaPorMes):
-    columnas =[613,822,830,870,924,1050] 
     fig,ax = plt.subplots()
 
     for columna in columnas:
@@ -76,7 +82,42 @@ def plotColumna(ax,columna, matrizFrecuencias):
     meses =["5/20","6/20","7/20","8/20","9/20","10/20","11/20","12/20",
             "1/21","2/21","3/21","4/21","5/21","6/21","7/21","8/21","9/21","10/21","11/21","12/21",]
     ax.plot(meses,frecuencias, label=f"Posicion: {columna}")
+
+def filtrarMatriz(matriz,file):
+    #no tenia la secuencia de wohan.
+    posicionWohan={"Argentina-1-2021_Alineado.fasta": 1,
+                  "Argentina-10-2020_Alineado.fasta": 1,
+                  "Argentina-10-2021_Alineado.fasta": 1,
+                  "Argentina-11-2020_Alineado.fasta": 1,
+                  "Argentina-11-2021_Alineado.fasta": 3,
+                  "Argentina-12-2020_Alineado.fasta": 1,
+                  "Argentina-12-2021_Alineado.fasta": 4,
+                  "Argentina-2-2021_Alineado.fasta": 8,
+                  "Argentina-3-2021_Alineado.fasta": 1,
+                  "Argentina-4-2021_Alineado.fasta": 1,
+                  "Argentina-5-2020_Alineado.fasta": 3,
+                  "Argentina-5-2021_Alineado.fasta": 6,
+                  "Argentina-6-2020_Alineado.fasta": 16,
+                  "Argentina-6-2021_Alineado.fasta": 0,
+                  "Argentina-7-2020_Alineado.fasta": 1,
+                  "Argentina-7-2021_Alineado.fasta": 1,
+                  "Argentina-8-2020_Alineado.fasta": 1,
+                  "Argentina-8-2021_Alineado.fasta": 14,
+                  "Argentina-9-2020_Alineado.fasta": 5,
+                  "Argentina-9-2021_Alineado.fasta": 1}
     
+    fila = posicionWohan[file]
+    nCol = 1274 #largo de la secuencia de wohan
+    i=0
+    while i< nCol:
+        if matriz[fila][i] == "-":
+            for j in range(len(matriz)):
+                secuenciaFiltrada = matriz[j][:i] + matriz[j][i+1:]
+                matriz[j]=secuenciaFiltrada
+        else:
+            i =i+1
+    
+        
            
     
 #hay que analisar los caracteres x e - .
@@ -94,6 +135,8 @@ if __name__ == "__main__":
             archivo = open( carpetaArchivosAlineados + file, "r")
             
             matriz = armarMatrizDeFasta(archivo)
+            
+            filtrarMatriz(matriz, file)
             
             #secuencia de wohan
             secuenciaRef = "MFVFLVLLPLVSSQCVNLTTRTQLPPAYTNSFTRGVYYPDKVFRSSVLHSTQDLFLPFFSNVTWFHAIHVSGTNGTKRFDNPVLPFNDGVYFASTEKSNIIRGWIFGTTLDSKTQSLLIVNNATNVVIKVCEFQFCNDPFLGVYYHKNNKSWMESEFRVYSSANNCTFEYVSQPFLMDLEGKQGNFKNLREFVFKNIDGYFKIYSKHTPINLVRDLPQGFSALEPLVDLPIGINITRFQTLLALHRSYLTPGDSSSGWTAGAAAYYVGYLQPRTFLLKYNENGTITDAVDCALDPLSETKCTLKSFTVEKGIYQTSNFRVQPTESIVRFPNITNLCPFGEVFNATRFASVYAWNRKRISNCVADYSVLYNSASFSTFKCYGVSPTKLNDLCFTNVYADSFVIRGDEVRQIAPGQTGKIADYNYKLPDDFTGCVIAWNSNNLDSKVGGNYNYLYRLFRKSNLKPFERDISTEIYQAGSTPCNGVEGFNCYFPLQSYGFQPTNGVGYQPYRVVVLSFELLHAPATVCGPKKSTNLVKNKCVNFNFNGLTGTGVLTESNKKFLPFQQFGRDIADTTDAVRDPQTLEILDITPCSFGGVSVITPGTNTSNQVAVLYQDVNCTEVPVAIHADQLTPTWRVYSTGSNVFQTRAGCLIGAEHVNNSYECDIPIGAGICASYQTQTNSPRRARSVASQSIIAYTMSLGAENSVAYSNNSIAIPTNFTISVTTEILPVSMTKTSVDCTMYICGDSTECSNLLLQYGSFCTQLNRALTGIAVEQDKNTQEVFAQVKQIYKTPPIKDFGGFNFSQILPDPSKPSKRSFIEDLLFNKVTLADAGFIKQYGDCLGDIAARDLICAQKFNGLTVLPPLLTDEMIAQYTSALLAGTITSGWTFGAGAALQIPFAMQMAYRFNGIGVTQNVLYENQKLIANQFNSAIGKIQDSLSSTASALGKLQDVVNQNAQALNTLVKQLSSNFGAISSVLNDILSRLDKVEAEVQIDRLITGRLQSLQTYVTQQLIRAAEIRASANLAATKMSECVLGQSKRVDFCGKGYHLMSFPQSAPHGVVFLHVTYVPAQEKNFTTAPAICHDGKAHFPREGVFVSNGTHWFVTQRNFYEPQIITTDNTFVSGNCDVVIGIVNNTVYDPLQPELDSFKEELDKYFKNHTSPDVDLGDISGINASVVNIQKEIDRLNEVAKNLNESLIDLQELGKYEQYIKWPWYIWLGFIAGLIAIVMVTIMLCCMTSCCSCLKGCCSCGSCCKFDEDDSEPVLKGVKLHYT*"
@@ -123,6 +166,40 @@ if __name__ == "__main__":
     matrizAdjacencia[matrizAdjacencia<theshold]=0
     matrizAdjacencia[matrizAdjacencia>=theshold]=1
     
+    
+    
+
+
+
+
+
+    G = nx.from_numpy_array(matrizAdjacencia)
+    
+    # Save the graph to a SIF file
+    with open('graph.sif', 'w') as f:
+        for edge in G.edges():
+            f.write(f"{edge[0]} pp {edge[1]}\n")
+
+    print("Graph saved as graph.sif")
+
+
+    # connected_nodes = set()
+    # for component in nx.connected_components(G):
+    #     connected_nodes.update(component)
+    
+    # # Crear un subgrafo con solo los nodos conectados
+    # G_connected = G.subgraph(connected_nodes).copy()
+
+    # # Dibujar el subgrafo con nodos conectados
+    # plt.figure(figsize=(8, 6))
+    # nx.draw(G_connected, with_labels=True, node_color='lightblue', edge_color='gray')
+    # plt.title('Grafo con Solo Nodos Conectados')
+    # plt.show()
+
+    # # Connect to Cytoscape
+    # # client = CyRestClient()
+
+
             
         
                     
