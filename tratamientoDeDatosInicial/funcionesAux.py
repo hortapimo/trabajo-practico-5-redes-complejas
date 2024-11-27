@@ -73,13 +73,14 @@ def plotColumnas(columnas,FrecuenciaPorMes):
     
     return(fig,ax)
 
-def plotColumna(ax,columna, matrizFrecuencias):
+def plotColumna(ax,columna, matrizFrecuencias, meses = None):
     frecuencias = [0]*20
     t=0
     for f in matrizFrecuencias:
         frecuencias[t] = f[columna]
         t=t+1
-    meses =["5/20","6/20","7/20","8/20","9/20","10/20","11/20","12/20",
+    if meses == None:    
+        meses =["5/20","6/20","7/20","8/20","9/20","10/20","11/20","12/20",
             "1/21","2/21","3/21","4/21","5/21","6/21","7/21","8/21","9/21","10/21","11/21","12/21",]
     ax.plot(meses,frecuencias, label=f"Posicion: {columna}")
 
@@ -180,8 +181,11 @@ if __name__ == "__main__":
         for edge in G.edges():
             f.write(f"{edge[0]} pp {edge[1]}\n")
 
-    print("Graph saved as graph.sif")
-
+    print("Graph saved as graph.sif") #para ver el grapho con cytoscape
+    
+    local_clustering = nx.clustering(G)
+    
+    nodosConCoeficienteClusteringAlto = {}
 
     # connected_nodes = set()
     # for component in nx.connected_components(G):
