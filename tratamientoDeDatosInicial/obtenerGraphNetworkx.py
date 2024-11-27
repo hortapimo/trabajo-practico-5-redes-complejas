@@ -51,7 +51,9 @@ def obtenerGrafo(carpetaArchivosAlineados, theshold):
 
 if __name__ == "__main__":
     carpetaArchivosAlineados = "archivosFasta/argentina/Alineados/"
-    sol = obtenerGrafo(carpetaArchivosAlineados, theshold=0.7)
+    sol = obtenerGrafo(carpetaArchivosAlineados, theshold=0.99)
+    
+    # mf.plotColumnas([245, 74,75, 858,189,17,25,489,19,1026,416,500,137,1175,500,416,654,483], sol[2])
     
     
     
